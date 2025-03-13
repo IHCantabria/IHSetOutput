@@ -16,12 +16,12 @@ class output_standard_netCDF(object):
     
     This class reads input datasets.
     """
-    def __init__(self, path, model, mode, type):
+    def __init__(self, path, model):
         # Dimensions
         self.path = path
         self.model = model
-        self.mode = mode
-        self.type = type
+        self.mode = model.mode
+        self.type = model.type
         self.ds = xr.open_dataset(path)
         self.ds.load()
         self.ds.close()
@@ -92,7 +92,6 @@ class output_standard_netCDF(object):
                 "obs": (("time_obs", "ntrs"), self.ds.obs, self.ds.obs.attrs),
                 "rot": ("time_obs", self.ds.rot, self.ds.rot.attrs),
                 "average_obs": ("time_obs", self.ds.average_obs, self.ds.average_obs.attrs),
-                # "simulation_1": ("time_1", self.model.full_run, self.simulation_attrs),
 
             },
             coords={
@@ -231,7 +230,7 @@ class output_standard_netCDF(object):
                 "min_value": np.nanmin(self.model.full_run),
                 "mean_value": np.nanmean(self.model.full_run),
                 "standard_deviation": np.nanstd(self.model.full_run),
-                "transect": self.model.trs
+                "transect": self.model.cfg["trs"]
             }
         elif self.type == 'RT':
             self.simulation_attrs = {
@@ -243,7 +242,7 @@ class output_standard_netCDF(object):
                 "min_value": np.nanmin(self.model.full_run),
                 "mean_value": circmean(self.model.full_run, high=360, low=0),
                 "standard_deviation": circstd(self.model.full_run, high=360, low=0),
-                "transect": self.model.trs
+                "transect": self.model.cfg["trs"]
             }
         elif self.type == 'HY':
             self.simulation_attrs = {
