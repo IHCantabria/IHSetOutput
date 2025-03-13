@@ -1,0 +1,5 @@
+numpy
+xarray
+datetime
+scipy
+IHSetUtils@ git+https://github.com/IHCantabria/IHSetUtils.git
