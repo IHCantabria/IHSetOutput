@@ -50,11 +50,9 @@ class output_standard_netCDF(object):
         # Lets use the date with YYY-MM-DDThh:mm:ssZ format        
         creation_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        simulations_info = {"1": {"Model Name": self.model.name, "Mode": self.mode, "Configuration": self.model.cfg}}
+        simulations_info = {"1": {"Model Name": self.model.name, "Mode": self.mode, "Configuration": json.dumps(self.model.cfg)}}
         # transform it to json format
         simulations_info = json.dumps(simulations_info)
-
-        self.check_models()
 
         self.attrs = {
             "title": "Output IH-SET file",
@@ -71,7 +69,7 @@ class output_standard_netCDF(object):
             "geospatial_lon_min": -180,
             "geospatial_lon_max": 180,
             "input_file": self.inp_filename,
-            "EPSG": self.ds.EPSG.values,
+            "EPSG": self.ds.EPSG,
             "simulations": simulations_info,
         }
 
@@ -81,7 +79,7 @@ class output_standard_netCDF(object):
         """
 
         self.set_attrs()
-        self.transform_data()
+        # self.transform_data()
         self.set_simulation_attrs()
 
 
@@ -89,13 +87,13 @@ class output_standard_netCDF(object):
         # Create dataset with xarray
         ds = xr.Dataset(
             {
-                "obs": (("time_obs", "ntrs"), self.ds.obs, self.ds.obs.attrs),
-                "rot": ("time_obs", self.ds.rot, self.ds.rot.attrs),
-                "average_obs": ("time_obs", self.ds.average_obs, self.ds.average_obs.attrs),
+                "obs": (("time_obs", "ntrs"), self.ds.obs.values, self.ds.obs.attrs),
+                "rot": ("time_obs", self.ds.rot.values, self.ds.rot.attrs),
+                "average_obs": ("time_obs", self.ds.average_obs.values, self.ds.average_obs.attrs),
 
             },
             coords={
-                "time": ("time", self.ds.time, {
+                "time": ("time", self.ds.time.values, {
                     "standard_name": "time",
                     "long_name": "Time"
                 }),
@@ -103,51 +101,51 @@ class output_standard_netCDF(object):
                     "standard_name": "time_1",
                     "long_name": "Time for model 1"
                 }),
-                "ntrs": ("ntrs",self.ds.ntrs, {
+                "ntrs": ("ntrs",self.ds.ntrs.values, {
                     "units": "number_of",
                     "standard_name": "number_of_trs",
                     "long_name": "Number of Transects"
                 }),
-                "time_obs": ("time_obs", self.ds.time_obs, {
+                "time_obs": ("time_obs", self.ds.time_obs.values, {
                     "standard_name": "time_of_observations",
                     "long_name": "Time of Observation"
                 }),
-                "xi": ("xi", self.ds.xi, {
+                "xi": ("xi", self.ds.xi.values, {
                     "units": "meters",
                     "standard_name": "xi_coordinate",
                     "long_name": "Origin x coordinate of transect"
                 }),
-                "yi": ("yi", self.ds.yi, {
+                "yi": ("yi", self.ds.yi.values, {
                     "units": "meters",
                     "standard_name": "yi_coordinate",
                     "long_name": "Origin y coordinate of transect"
                 }),
-                "xf": ("xf", self.ds.xf, {
+                "xf": ("xf", self.ds.xf.values, {
                     "units": "meters",
                     "standard_name": "xf_coordinate",
                     "long_name": "End x coordinate of transect"
                 }),
-                "yf": ("yf", self.ds.yf, {
+                "yf": ("yf", self.ds.yf.values, {
                     "units": "meters",
                     "standard_name": "yf_coordinate",
                     "long_name": "End y coordinate of transect"
                 }),
-                "phi": ("phi", self.ds.phi, {
+                "phi": ("phi", self.ds.phi.values, {
                     "units": "degrees",
                     "standard_name": "transect_angle",
                     "long_name": "Cartesian angle of transect"
                 }),
-                "x_pivotal": ("x_pivotal", self.ds.x_pivotal, {
+                "x_pivotal": ("x_pivotal", self.ds.x_pivotal.values, {
                     "units": "meters",
                     "standard_name": "x_pivotal",
                     "long_name": "Initial x coordinate of pivotal transect"
                 }),
-                "y_pivotal": ("y_pivotal", self.ds.y_pivotal, {
+                "y_pivotal": ("y_pivotal", self.ds.y_pivotal.values, {
                     "units": "meters",
                     "standard_name": "y_pivotal",
                     "long_name": "Initial y coordinate of pivotal transect"
                 }),
-                "phi_pivotal": ("phi_pivotal", self.ds.phi_pivotal, {
+                "phi_pivotal": ("phi_pivotal", self.ds.phi_pivotal.values, {
                     "units": "degrees",
                     "standard_name": "phi_pivotal",
                     "long_name": "Angle of pivotal transect"
@@ -173,6 +171,8 @@ class output_standard_netCDF(object):
             ds["simulation_1_rot"] = (("time_1"), rot, self.simulation_attrs)
         
         # Export to NetCDF
+        print("-------------------------------------------------")
+        print(self.path)
         ds.to_netcdf(self.path, engine="netcdf4")
 
         print(f"{self.filename} saved correctly.")
@@ -182,7 +182,7 @@ class output_standard_netCDF(object):
         Write new data to the output file
         """
 
-        self.transform_data()
+        # self.transform_data()
         self.set_simulation_attrs()
 
         # Open the output file
@@ -260,7 +260,7 @@ class output_standard_netCDF(object):
             }
 
 
-        for key, value in key(self.model.par_names, self.model.par_values):
+        for key, value in zip(self.model.par_names, self.model.par_values):
             self.simulation_attrs[key] = value
 
 
