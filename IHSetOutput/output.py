@@ -50,7 +50,7 @@ class output_standard_netCDF(object):
         # Lets use the date with YYY-MM-DDThh:mm:ssZ format        
         creation_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        simulations_info = {"1": {"Model Name": self.model.name, "Mode": self.mode, "Configuration": json.loads(self.model.cfg)}}
+        simulations_info = {"1": {"Model Name": self.model.name, "Mode": self.mode, "Configuration": self.model.cfg}}
         # transform it to json format
         simulations_info = json.dumps(simulations_info)
 
