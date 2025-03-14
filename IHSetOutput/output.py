@@ -5,6 +5,7 @@ import json
 from scipy.stats import circmean, circstd
 import numpy as np
 from IHSetUtils import abs_pos
+import os
 
 
 
@@ -25,10 +26,14 @@ class output_standard_netCDF(object):
         self.ds = xr.open_dataset(path)
         self.ds.load()
         self.ds.close()
-        self.inp_filename = path.split('/')[-1]
+        self.inp_filename = os.path.basename(path)
+
+        print(f"Input file: {self.inp_filename}")
 
         self.filename = 'out_'+self.inp_filename.split('.')[0]+'.nc'
         self.path = path.replace(self.inp_filename, self.filename)
+
+        print(f"Output file: {self.filename}")
 
         # Check if output file already exists
         if self.filename in path:
@@ -171,8 +176,6 @@ class output_standard_netCDF(object):
             ds["simulation_1_rot"] = (("time_1"), rot, self.simulation_attrs)
         
         # Export to NetCDF
-        print("-------------------------------------------------")
-        print(self.path)
         ds.to_netcdf(self.path, engine="netcdf4")
 
         print(f"{self.filename} saved correctly.")
