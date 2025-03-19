@@ -7,8 +7,6 @@ import numpy as np
 from IHSetUtils import abs_pos
 import os
 
-
-
 class output_standard_netCDF(object):
     """
     output_standard_netCDF
@@ -167,12 +165,12 @@ class output_standard_netCDF(object):
         elif self.type == 'HY':
             ds["simulation_1"] = (("time_1", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds["simulation_1_avg"] = (("time_1"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
-            rot = calculate_rotation(self.ds.xi, self.ds.yi, self.ds.phi, self.model.full_run)
+            rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
             ds["simulation_1_rot"] = (("time_1"), rot, self.simulation_attrs)
         elif self.type == 'OL':
-            ds["simulation_1"] = (("time_1", "ntrs"), self.model.full_run, self.simulation)
+            ds["simulation_1"] = (("time_1", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds["simulation_1_avg"] = (("time_1"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
-            rot = calculate_rotation(self.ds.xi, self.ds.yi, self.ds.phi, self.model.full_run)
+            rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
             ds["simulation_1_rot"] = (("time_1"), rot, self.simulation_attrs)
         
         # Export to NetCDF
@@ -205,12 +203,12 @@ class output_standard_netCDF(object):
         elif self.type == 'HY':
             ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds[f"simulation_{n_sim+1}_avg"] = ((f"time_{n_sim+1}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
-            rot = calculate_rotation(self.ds.xi, self.ds.yi, self.ds.phi, self.model.full_run)
+            rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
             ds[f"simulation_{n_sim+1}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
         elif self.type == 'OL':
             ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation)
             ds[f"simulation_{n_sim+1}_avg"] = ((f"time_{n_sim+1}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
-            rot = calculate_rotation(self.ds.xi, self.ds.yi, self.ds.phi, self.model.full_run)
+            rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
             ds[f"simulation_{n_sim+1}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
 
         # Save the dataset
@@ -298,6 +296,7 @@ def calculate_rotation(X0, Y0, phi, dist):
         if not nans_rot[i]:
             XN, YN = X0 + detrended_dist[i, :] * np.cos(phi_rad), Y0 + detrended_dist[i, :] * np.sin(phi_rad)
             ii_nan = np.isnan(XN) | np.isnan(YN)
+
             fitter = np.polyfit(XN[~ii_nan], YN[~ii_nan], 1)
             alpha[i] = 90 - np.rad2deg(np.arctan(fitter[0]))
             if alpha[i] < 0:
