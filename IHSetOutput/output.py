@@ -206,7 +206,7 @@ class output_standard_netCDF(object):
             rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
             ds[f"simulation_{n_sim+1}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
         elif self.type == 'OL':
-            ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation)
+            ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds[f"simulation_{n_sim+1}_avg"] = ((f"time_{n_sim+1}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
             rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
             ds[f"simulation_{n_sim+1}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
