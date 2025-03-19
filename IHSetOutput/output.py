@@ -34,7 +34,7 @@ class output_standard_netCDF(object):
         print(f"Output file: {self.filename}")
 
         # Check if output file already exists
-        if self.filename in path:
+        if os.path.exists(self.path):
             print(f"Output file {self.filename} already exists. Loading it to add new results.")
             self.writing_flag = False
             self.write_to_output_file()
