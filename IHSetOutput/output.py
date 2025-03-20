@@ -191,7 +191,7 @@ class output_standard_netCDF(object):
         ds.close()
 
         cratiion_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-        ds.attrs["Modified"] = f'Modified on {cratiion_date}'
+        ds.attrs["History"] = f'Modified on {cratiion_date}'
 
         # first we need to check how many simulation already exist
         # n_sim = len(ds.data_vars) - 3
