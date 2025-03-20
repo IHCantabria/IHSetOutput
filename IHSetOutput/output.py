@@ -93,7 +93,6 @@ class output_standard_netCDF(object):
                 "obs": (("time_obs", "ntrs"), self.ds.obs.values, self.ds.obs.attrs),
                 "rot": ("time_obs", self.ds.rot.values, self.ds.rot.attrs),
                 "average_obs": ("time_obs", self.ds.average_obs.values, self.ds.average_obs.attrs),
-
             },
             coords={
                 "time": ("time", self.ds.time.values, {
@@ -187,10 +186,23 @@ class output_standard_netCDF(object):
         self.set_simulation_attrs()
 
         # Open the output file
-        ds = xr.open_dataset(self.path, mode="a")
+        ds = xr.open_dataset(self.path)
+        ds.load()
+        ds.close()
+
+        cratiion_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        ds.attrs["Modified"] = f'Modified on {cratiion_date}'
 
         # first we need to check how many simulation already exist
-        n_sim = len(ds.data_vars) - 3
+        # n_sim = len(ds.data_vars) - 3
+        # we need the list of the var names
+        var_names = list(ds.data_vars.keys())
+
+        # we need to check how many simulation already exist
+        n_sim = 0
+        for i, var in enumerate(var_names):
+            if f"simulation_{i}" in var:
+                n_sim += 1
 
         
         # Add the coordinate f"time_{n_sim+1}" to the dataset
@@ -213,7 +225,6 @@ class output_standard_netCDF(object):
 
         # Save the dataset
         ds.to_netcdf(self.path, engine="netcdf4")
-
         ds.close()
 
         print(f"New data saved to {self.filename}.")
