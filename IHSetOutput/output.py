@@ -243,7 +243,7 @@ class output_standard_netCDF(object):
                 "min_value": np.nanmin(self.model.full_run),
                 "mean_value": np.nanmean(self.model.full_run),
                 "standard_deviation": np.nanstd(self.model.full_run),
-                "transect": self.model.cfg["trs"]
+                "transect": self.model.cfg["trs"],
             }
         elif self.type == 'RT':
             self.simulation_attrs = {
@@ -272,9 +272,9 @@ class output_standard_netCDF(object):
                 "long_name": f"Shoreline position calulated by the model{self.model.name}",
             }
 
-
+        # Add the model parameters to the simulation attributes
         for key, value in zip(self.model.par_names, self.model.par_values):
-            self.simulation_attrs[key] = value
+            self.simulation_attrs['par_'+key] = value
 
 
     def transform_data(self):
