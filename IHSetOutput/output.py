@@ -53,9 +53,9 @@ class output_standard_netCDF(object):
         # Lets use the date with YYY-MM-DDThh:mm:ssZ format        
         creation_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        simulations_info = {"1": {"Model Name": self.model.name, "Mode": self.mode, "Configuration": json.dumps(self.model.cfg)}}
-        # transform it to json format
-        simulations_info = json.dumps(simulations_info)
+        # simulations_info = {"1": {"Model Name": self.model.name, "Mode": self.mode, "Configuration": json.dumps(self.model.cfg)}}
+        # # transform it to json format
+        # simulations_info = json.dumps(simulations_info)
 
         self.attrs = {
             "title": "Output IH-SET file",
@@ -73,7 +73,7 @@ class output_standard_netCDF(object):
             "geospatial_lon_max": 180,
             "input_file": self.inp_filename,
             "EPSG": self.ds.EPSG,
-            "simulations": simulations_info,
+            # "simulations": simulations_info,
         }
 
     def create_output_file(self):
@@ -156,7 +156,6 @@ class output_standard_netCDF(object):
                     "standard_name": "number_of_simulations",
                     "long_name": "Number of simulations in the dataset",
                 }),
-
             },
             attrs=self.attrs
         )
@@ -241,6 +240,7 @@ class output_standard_netCDF(object):
                 "mean_value": np.nanmean(self.model.full_run),
                 "standard_deviation": np.nanstd(self.model.full_run),
                 "transect": self.model.cfg["trs"],
+                "model": self.model.name,
             }
         elif self.type == 'RT':
             self.simulation_attrs = {
@@ -252,7 +252,7 @@ class output_standard_netCDF(object):
                 "min_value": np.nanmin(self.model.full_run),
                 "mean_value": circmean(self.model.full_run, high=360, low=0),
                 "standard_deviation": circstd(self.model.full_run, high=360, low=0),
-                "transect": self.model.cfg["trs"]
+                "model": self.model.name,
             }
         elif self.type == 'HY':
             self.simulation_attrs = {
@@ -260,6 +260,7 @@ class output_standard_netCDF(object):
                 "standard_name": "shoreline_position",
                 "model_type": "Hybrid",
                 "long_name": f"Shoreline position calulated by the model{self.model.name}",
+                "model": self.model.name,
             }
         elif self.type == 'OL':
             self.simulation_attrs = {
@@ -267,6 +268,7 @@ class output_standard_netCDF(object):
                 "standard_name": "shoreline_position",
                 "model_type": "One Line",
                 "long_name": f"Shoreline position calulated by the model{self.model.name}",
+                "model": self.model.name,
             }
 
         # Add the model parameters to the simulation attributes
