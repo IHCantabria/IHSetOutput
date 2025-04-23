@@ -199,30 +199,30 @@ class output_standard_netCDF(object):
         # we need the list of the var names
         var_names = list(ds.data_vars.keys())
 
-        # we need to check how many simulation already exist
-        n_sim = 0
-        for i, var in enumerate(var_names):
-            if f"simulation_{i}" in var:
-                n_sim += 1
 
+        # we need to check how many simulation already exist
+        n_sim = 1
+        for i, var in enumerate(var_names):
+            if f"simulation_{n_sim}" in var and "_avg" not in var and "_rot" not in var:
+                n_sim += 1
         
         # Add the coordinate f"time_{n_sim+1}" to the dataset
-        ds.coords[f"time_{n_sim+1}"] = self.model.time
+        ds.coords[f"time_{n_sim}"] = self.model.time
 
         if self.type == 'CS':
-            ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}"), self.model.full_run, self.simulation_attrs)
+            ds[f"simulation_{n_sim}"] = ((f"time_{n_sim+1}"), self.model.full_run, self.simulation_attrs)
         elif self.type == 'RT':
-            ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}"), self.model.full_run, self.simulation_attrs)
+            ds[f"simulation_{n_sim}"] = ((f"time_{n_sim+1}"), self.model.full_run, self.simulation_attrs)
         elif self.type == 'HY':
-            ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation_attrs)
-            ds[f"simulation_{n_sim+1}_avg"] = ((f"time_{n_sim+1}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
+            ds[f"simulation_{n_sim}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation_attrs)
+            ds[f"simulation_{n_sim}_avg"] = ((f"time_{n_sim+1}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
             rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
-            ds[f"simulation_{n_sim+1}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
+            ds[f"simulation_{n_sim}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
         elif self.type == 'OL':
-            ds[f"simulation_{n_sim+1}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation_attrs)
-            ds[f"simulation_{n_sim+1}_avg"] = ((f"time_{n_sim+1}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
+            ds[f"simulation_{n_sim}"] = ((f"time_{n_sim+1}", "ntrs"), self.model.full_run, self.simulation_attrs)
+            ds[f"simulation_{n_sim}_avg"] = ((f"time_{n_sim+1}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
             rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
-            ds[f"simulation_{n_sim+1}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
+            ds[f"simulation_{n_sim}_rot"] = ((f"time_{n_sim+1}"), rot, self.simulation_attrs)
 
         # Save the dataset
         ds.to_netcdf(self.path, engine="netcdf4")
@@ -238,7 +238,7 @@ class output_standard_netCDF(object):
                 "units": "Meters",
                 "standard_name": "shoreline_position",
                 "model_type": "Cross shore",
-                "long_name": f"Shoreline position calulated by the model{self.model.name}",
+                "long_name": f"Shoreline position calulated by the model {self.model.name}",
                 "max_value": np.nanmax(self.model.full_run),
                 "min_value": np.nanmin(self.model.full_run),
                 "mean_value": np.nanmean(self.model.full_run),
