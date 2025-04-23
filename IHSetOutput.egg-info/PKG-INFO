@@ -13,3 +13,8 @@ Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
+Requires-Dist: numpy
+Requires-Dist: xarray
+Requires-Dist: datetime
+Requires-Dist: scipy
+Requires-Dist: IHSetUtils@ git+https://github.com/IHCantabria/IHSetUtils.git

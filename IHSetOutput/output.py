@@ -174,6 +174,7 @@ class output_standard_netCDF(object):
         
         # Export to NetCDF
         ds.to_netcdf(self.path, engine="netcdf4")
+        ds.close()
 
         print(f"{self.filename} saved correctly.")
 
