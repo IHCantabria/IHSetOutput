@@ -167,13 +167,12 @@ class output_standard_netCDF(object):
         elif self.type == 'HY':
             ds["simulation_1"] = (("time_1", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds["simulation_1_avg"] = (("time_1"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
-            rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
-            ds["simulation_1_rot"] = (("time_1"), rot, self.simulation_attrs)
+            ds["simulation_1_rot"] = (("time_1"), self.mode.model_long.full_run, self.simulation_attrs_rot)
         elif self.type == 'OL':
             ds["simulation_1"] = (("time_1", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds["simulation_1_avg"] = (("time_1"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
             rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
-            ds["simulation_1_rot"] = (("time_1"), rot, self.simulation_attrs)
+            ds["simulation_1_rot"] = (("time_1"), rot, self.simulation_attrs_rot)
         
         # Export to NetCDF
         ds.to_netcdf(self.path, engine="netcdf4")
@@ -212,13 +211,12 @@ class output_standard_netCDF(object):
         elif self.type == 'HY':
             ds[f"simulation_{n_sim}"] = ((f"time_{n_sim}", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds[f"simulation_{n_sim}_avg"] = ((f"time_{n_sim}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
-            rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
-            ds[f"simulation_{n_sim}_rot"] = ((f"time_{n_sim}"), rot, self.simulation_attrs)
+            ds[f"simulation_{n_sim}_rot"] = ((f"time_{n_sim}"), self.model.model_long.full_run, self.simulation_attrs_rot)
         elif self.type == 'OL':
             ds[f"simulation_{n_sim}"] = ((f"time_{n_sim}", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds[f"simulation_{n_sim}_avg"] = ((f"time_{n_sim}"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
             rot, _ = calculate_rotation(self.ds.xi.values, self.ds.yi.values, self.ds.phi.values, self.model.full_run)
-            ds[f"simulation_{n_sim}_rot"] = ((f"time_{n_sim}"), rot, self.simulation_attrs)
+            ds[f"simulation_{n_sim}_rot"] = ((f"time_{n_sim}"), rot, self.simulation_attrs_rot)
 
         # Save the dataset
         ds.to_netcdf(self.path, engine="netcdf4")
@@ -244,10 +242,10 @@ class output_standard_netCDF(object):
             }
         elif self.type == 'RT':
             self.simulation_attrs = {
-                "units": "Meters",
+                "units": "Nautical degrees",
                 "standard_name": "shoreline_orientation",
                 "model_type": "Rotation",
-                "long_name": f"Shoreline position calulated by the model{self.model.name}",
+                "long_name": f"Shoreline orientation calulated by the model {self.model.name}",
                 "max_value": np.nanmax(self.model.full_run),
                 "min_value": np.nanmin(self.model.full_run),
                 "mean_value": circmean(self.model.full_run, high=360, low=0),
@@ -259,21 +257,48 @@ class output_standard_netCDF(object):
                 "units": "Meters",
                 "standard_name": "shoreline_position",
                 "model_type": "Hybrid",
-                "long_name": f"Shoreline position calulated by the model{self.model.name}",
+                "long_name": f"Shoreline position calulated by the model {self.model.name}, using the models {self.model.mode_cross.name} and {self.model.model_long.name} as cross-shore and rotation models respectively",
                 "model": self.model.name,
             }
+            self.simulation_attrs_rot = {
+                "units": "Nautical degrees",
+                "standard_name": "shoreline_orientation",
+                "model_type": "Rotation",
+                "long_name": f"Shoreline orientation calulated by the model {self.model.model_long.name}",
+                "max_value": np.nanmax(self.model.full_run),
+                "min_value": np.nanmin(self.model.full_run),
+                "mean_value": circmean(self.model.full_run, high=360, low=0),
+                "standard_deviation": circstd(self.model.full_run, high=360, low=0),
+                "model": self.model.name,
+            }
+            for key, value in zip(self.model.model_long.par_names, self.model.model_long.par_values):
+                self.simulation_attrs['par_'+key] = value
         elif self.type == 'OL':
             self.simulation_attrs = {
                 "units": "Meters",
                 "standard_name": "shoreline_position",
                 "model_type": "One Line",
-                "long_name": f"Shoreline position calulated by the model{self.model.name}",
+                "long_name": f"Shoreline position calulated by the model {self.model.name}",
                 "model": self.model.name,
             }
+            self.simulation_attrs_rot = {
+                "units": "Nautical degrees",
+                "standard_name": "shoreline_orientation",
+                "model_type": "Rotation",
+                "long_name": f"Shoreline orientation calulated by the model {self.model.name}",
+                "max_value": np.nanmax(self.model.full_run),
+                "min_value": np.nanmin(self.model.full_run),
+                "mean_value": circmean(self.model.full_run, high=360, low=0),
+                "standard_deviation": circstd(self.model.full_run, high=360, low=0),
+                "model": self.model.name,
+            }
+
 
         # Add the model parameters to the simulation attributes
         for key, value in zip(self.model.par_names, self.model.par_values):
             self.simulation_attrs['par_'+key] = value
+        
+
 
 
     def transform_data(self):
