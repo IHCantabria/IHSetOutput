@@ -19,7 +19,7 @@ class output_standard_netCDF(object):
         # Dimensions
         self.path = path
         self.model = model
-        self.mode = model.mode
+        # self.mode = model.mode
         self.type = model.type
         self.ds = xr.open_dataset(path)
         self.ds.load()
@@ -167,7 +167,7 @@ class output_standard_netCDF(object):
         elif self.type == 'HY':
             ds["simulation_1"] = (("time_1", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds["simulation_1_avg"] = (("time_1"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
-            ds["simulation_1_rot"] = (("time_1"), self.mode.model_long.full_run, self.simulation_attrs_rot)
+            ds["simulation_1_rot"] = (("time_1"), self.model.model_long.full_run, self.simulation_attrs_rot)
         elif self.type == 'OL':
             ds["simulation_1"] = (("time_1", "ntrs"), self.model.full_run, self.simulation_attrs)
             ds["simulation_1_avg"] = (("time_1"), np.mean(self.model.full_run, axis=1), self.simulation_attrs)
