@@ -19,7 +19,6 @@ class output_standard_netCDF(object):
         # Dimensions
         self.path = path
         self.model = model
-        self.mode = model.mode
         self.type = model.type
         self.ds = xr.open_dataset(path)
         self.ds.load()
