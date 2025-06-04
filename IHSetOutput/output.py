@@ -19,7 +19,7 @@ class output_standard_netCDF(object):
         # Dimensions
         self.path = path
         self.model = model
-        # self.mode = model.mode
+        self.mode = model.mode
         self.type = model.type
         self.ds = xr.open_dataset(path)
         self.ds.load()
@@ -263,7 +263,7 @@ class output_standard_netCDF(object):
             self.simulation_attrs_rot = {
                 "units": "Nautical degrees",
                 "standard_name": "shoreline_orientation",
-                "model_type": "Rotation",
+                "model_type": "Hybrid",
                 "long_name": f"Shoreline orientation calulated by the model {self.model.model_long.name}",
                 "max_value": np.nanmax(self.model.full_run),
                 "min_value": np.nanmin(self.model.full_run),
@@ -284,7 +284,7 @@ class output_standard_netCDF(object):
             self.simulation_attrs_rot = {
                 "units": "Nautical degrees",
                 "standard_name": "shoreline_orientation",
-                "model_type": "Rotation",
+                "model_type": "One Line",
                 "long_name": f"Shoreline orientation calulated by the model {self.model.name}",
                 "max_value": np.nanmax(self.model.full_run),
                 "min_value": np.nanmin(self.model.full_run),
