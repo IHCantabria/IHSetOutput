@@ -296,7 +296,7 @@ class output_standard_netCDF(object):
                     "units": "Meters",
                     "standard_name": "shoreline_position",
                     "model_type": "Hybrid",
-                    "long_name": f"Shoreline position calulated by cross-shore + one-line model, using {self.model.model_cross} as cross-shorecomponent",
+                    "long_name": f"Shoreline position calulated by cross-shore + one-line model, using {self.model.cs_model} as cross-shorecomponent",
                     "model": self.model.name,
                 }
                 self.simulation_attrs_rot = {
