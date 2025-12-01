@@ -290,7 +290,9 @@ class output_standard_netCDF(object):
                     "model": self.model.name,
                 }
                 for key, value in zip(self.model.model_long.par_names, self.model.model_long.par_values):
-                    self.simulation_attrs['par_'+key] = value
+                    self.simulation_attrs_rot['par_rot_'+key] = value
+                for key, value in zip(self.model.model_cross.par_names, self.model.model_cross.par_values):
+                    self.simulation_attrs['par_cross_'+key] = value
             else:
                 self.simulation_attrs = {
                     "units": "Meters",
